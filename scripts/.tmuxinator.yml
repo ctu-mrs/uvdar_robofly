@@ -1,0 +1,26 @@
+name: simulation
+root: ./
+startup_window: launch
+pre_window: UAV_NAME=uav40
+windows:
+        # - roscore
+  - launch:
+      layout: even-vertical
+      panes:
+        - roslaunch uvdar_core rosbag_camp.launch uav_name:=$UAV_NAME use_4DHT:=false
+  - play:
+      layout: even-vertical
+      panes:
+        # - waitForRos; sleep 3; rosbag play --clock ~/flight_island/tim_rx_agile/tim_rx_agile/7_2024_10_31_15_59_22/_2024-10-31-15-59-47.bag 
+        # - waitForRos; sleep 3; rosbag play --clock ~/flight_island/tim_rx_agile/tim_rx_agile/5_2024_10_31_15_45_41/_2024-10-31-15-49_12.bag 
+        - waitForRos; sleep 3; rosbag play --clock ~/flight_island/tim_rx_agile/tim_rx_agile/4_2024_10_31_15_28_40/_2024-10-31-15-41-11.bag 
+
+  - record:
+      layout: even-vertical
+      panes:
+        - waitForRos; sleep 3; rosbag record -e "(.*)$UAV_NAME(.*)/uvdar/(.*)_right_camp" "/debug_topics(.*)" "/uav40/estimation_manager/odom_main" "/uav40/mavlink/from" -O "/home/tim/rosbags/ami_paper/outdoor/island/4_4dht_false_test"
+  - htop:
+      layout: even-vertical
+      panes:
+        # - htop
+        # - waitForRos; sleep 3; rosbag record -a -O "/home/tim/rosbags/ami_paper/ami_test_test"
