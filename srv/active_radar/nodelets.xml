@@ -1,5 +1,0 @@
-<library path="lib/libactive_radar">
-  <class name="active_radar/ActiveRadarNodelet" type="active_radar::ActiveRadarNodelet" base_class_type="nodelet::Nodelet">
-    <description>Nodelet for controlling a UWB transceiver for distance ranging.</description>
-  </class>
-</library>
