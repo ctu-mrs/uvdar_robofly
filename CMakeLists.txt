@@ -46,6 +46,7 @@ set(LIBRARIES
   UvdarRobofly_UVDARBluefoxEmulator
   UvdarRobofly_compute_lib
   UvdarRobofly_ActiveRadar
+  UvdarRobofly_SocketUtils
   )
 
 set(EXECUTABLES
