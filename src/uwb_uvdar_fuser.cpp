@@ -14,7 +14,7 @@
 #include <mrs_msgs/Vec4.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
-#include <uvdar_core/ImagePointsWithFloatStamped.h> 
+#include <uvdar_robofly/ImagePointsWithFloatStamped.h> 
 
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
@@ -146,7 +146,7 @@ namespace uvdar {
 
 
       // | ----------------------- camera data --------------------- |
-      using blinkers_seen_callback_t = boost::function<void (const uvdar_core::ImagePointsWithFloatStampedConstPtr& msg)>;
+      using blinkers_seen_callback_t = boost::function<void (const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& msg)>;
       struct CameraContext{
         std::string topic;
         blinkers_seen_callback_t callback;
@@ -277,7 +277,7 @@ namespace uvdar {
 
           cameras_.back().tf_frame = _camera_frames.at(i);
 
-          cameras_.back().callback = [image_index=i,this] (const uvdar_core::ImagePointsWithFloatStampedConstPtr& pointsMessage) { 
+          cameras_.back().callback = [image_index=i,this] (const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& pointsMessage) { 
             ProcessBlinkPoints(pointsMessage, image_index);
           };
 
@@ -286,7 +286,7 @@ namespace uvdar {
 
 
           if (_calib_files.at(i) == "default"){
-            cameras_.back().calibration_file = ros::package::getPath("uvdar_core")+"/config/ocamcalib/calib_results_bf_uv_fe.txt";
+            cameras_.back().calibration_file = ros::package::getPath("uvdar_robofly")+"/config/ocamcalib/calib_results_bf_uv_fe.txt";
           }
           else {
             cameras_.back().calibration_file = _calib_files.at(i);
@@ -366,7 +366,7 @@ namespace uvdar {
        * @param image_index - index of the camera producing the given message
        */
       /* ProcessBlinkPoints //{ */
-      void ProcessBlinkPoints(const uvdar_core::ImagePointsWithFloatStampedConstPtr& msg, size_t image_index) {
+      void ProcessBlinkPoints(const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& msg, size_t image_index) {
         if (!initialized_){
           ROS_ERROR_STREAM("[UWB_UVDAR_Fuser]: Uninitialized! Ignoring image points.");
           return;
@@ -403,7 +403,7 @@ namespace uvdar {
         }
 
 
-        uvdar_core::ImagePointsWithFloatStamped msg_local;
+        uvdar_robofly::ImagePointsWithFloatStamped msg_local;
         {
           /* std::scoped_lock lock(uvdar_meas_mutex); */
           //TODO consider if it is necessary to mutex or locally copy this
@@ -470,8 +470,8 @@ namespace uvdar {
        * @return A vector of vectors of blinker points, each associated with its own tracker
        *
        * associateImagePointsToTargets //{ */
-      std::vector<std::pair<int,std::vector<uvdar_core::Point2DWithFloat>>> associateImagePointsToTargets(uvdar_core::ImagePointsWithFloatStamped msg, int image_index){
-        std::vector< std::pair<int, std::vector<uvdar_core::Point2DWithFloat>>> output;
+      std::vector<std::pair<int,std::vector<uvdar_robofly::Point2DWithFloat>>> associateImagePointsToTargets(uvdar_robofly::ImagePointsWithFloatStamped msg, int image_index){
+        std::vector< std::pair<int, std::vector<uvdar_robofly::Point2DWithFloat>>> output;
         for (auto &pt : msg.points){
           // pt.x = pt.x*2;
           // pt.y = pt.y*2;
@@ -644,7 +644,7 @@ namespace uvdar {
       }
 
 
-      bool measurementCompatible(FilterData filter, uvdar_core::Point2DWithFloat pt, int image_index, ros::Time time){
+      bool measurementCompatible(FilterData filter, uvdar_robofly::Point2DWithFloat pt, int image_index, ros::Time time){
         std::scoped_lock lock(transformer_mutex);
 
 
@@ -761,7 +761,7 @@ namespace uvdar {
        * @param stamp Time of the measurement
        */
       /* initiateNew //{ */
-      bool initiateNew(uvdar_core::Point2DWithFloat pt, ros::Time stamp){
+      bool initiateNew(uvdar_robofly::Point2DWithFloat pt, ros::Time stamp){
         if (fd_.size() > MAX_TARGET_COUNT)
           return false;
 

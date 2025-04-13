@@ -2,11 +2,11 @@
 #include <ros/package.h>
 #include <mrs_lib/param_loader.h>
 #include <cv_bridge/cv_bridge.h>
-#include <uvdar_core/ImagePointsWithFloatStamped.h>
+#include <uvdar_robofly/ImagePointsWithFloatStamped.h>
 #include <mrs_lib/transformer.h>
 #include <mrs_msgs/String.h>
 #include <std_msgs/Float32.h>
-#include <uvdar_core/RecMsg.h>
+#include <uvdar_robofly/RecMsg.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <string>
@@ -36,7 +36,7 @@ std::vector<std::string>    blinkers_seen_topics;
 std::vector<std::string>    estimated_framerate_topics;
 std::vector<ros::Publisher> pub_blinkers_seen;
 std::vector<ros::Publisher> pub_estimated_framerate;
-using points_seen_callback = boost::function<void(const uvdar_core::ImagePointsWithFloatStampedConstPtr&)>;
+using points_seen_callback = boost::function<void(const uvdar_robofly::ImagePointsWithFloatStampedConstPtr&)>;
 std::vector<points_seen_callback> callbacks_points_seen;
 std::vector<ros::Subscriber>      subscribers_points_seen;
  
@@ -76,13 +76,13 @@ public:
 
     // make publishers for viktors pose calculator and filter
     for (size_t i = 0; i < blinkers_seen_topics.size(); ++i) {
-      pub_blinkers_seen.push_back(nh.advertise<uvdar_core::ImagePointsWithFloatStamped>(blinkers_seen_topics[i], 1));
+      pub_blinkers_seen.push_back(nh.advertise<uvdar_robofly::ImagePointsWithFloatStamped>(blinkers_seen_topics[i], 1));
     }
     for (size_t i = 0; i < estimated_framerate_topics.size(); ++i) {
       pub_estimated_framerate.push_back(nh.advertise<std_msgs::Float32>(estimated_framerate_topics[i], 1));
     }
 
-    pub_rec_msg = nh.advertise<uvdar_core::RecMsg>(recieved_topic, 1);  // to publish decoded msgs for uvdar node
+    pub_rec_msg = nh.advertise<uvdar_robofly::RecMsg>(recieved_topic, 1);  // to publish decoded msgs for uvdar node
 
     std::vector<std::vector<PointSeen>> tmp;
     std::vector<RecSignals> init_signal; 
@@ -105,7 +105,7 @@ public:
       ci_new.cam_id = i;
       cam_info.push_back(ci_new);
       // callback of individual image frames
-      points_seen_callback callback = [i, this](const uvdar_core::ImagePointsWithFloatStampedConstPtr& pointsMessage) { VisiblePoints(pointsMessage, i); };
+      points_seen_callback callback = [i, this](const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& pointsMessage) { VisiblePoints(pointsMessage, i); };
       callbacks_points_seen.push_back(callback);
       subscribers_points_seen.push_back(nh.subscribe(points_seen_topics[i], 1, callbacks_points_seen[i]));
       
@@ -188,7 +188,7 @@ private:
     return payload;
   }
 
-  void VisiblePoints(const uvdar_core::ImagePointsWithFloatStampedConstPtr& points_seen_msg, size_t camera_index) {
+  void VisiblePoints(const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& points_seen_msg, size_t camera_index) {
     /* if(camera_index!=0) return; */
 
     /*
@@ -763,13 +763,13 @@ private:
         /*   std::cout << std::endl; */
         /* } */
             
-        uvdar_core::ImagePointsWithFloatStamped msg;
+        uvdar_robofly::ImagePointsWithFloatStamped msg;
         msg.stamp        = nb.sample_time;
         msg.image_width  = points_seen_msg->image_width;
         msg.image_height = points_seen_msg->image_height;
 
         for (auto& blinker : nb.positions) {
-          uvdar_core::Point2DWithFloat point;
+          uvdar_robofly::Point2DWithFloat point;
           point.x     = blinker.x;
           point.y     = blinker.y;
           point.value = nb.frequency;
@@ -777,7 +777,7 @@ private:
         }
         pub_blinkers_seen[camera_index].publish(msg);
       
-        uvdar_core::RecMsg rm_pub;
+        uvdar_robofly::RecMsg rm_pub;
         rm_pub.uav_id = nb.id;
         rm_pub.pl_carrying = false;
         rm_pub.heading     = nb.angle;
@@ -826,13 +826,13 @@ private:
       /* if (point_seen[camera_index][i].back().decoded) { */
       /*   if (!point_seen[camera_index][i].back().positions.empty()) { */
       /*     if (point_seen[camera_index][i].back().cnt_last_published >= 5) { */
-      /*       uvdar_core::ImagePointsWithFloatStamped msg; */
+      /*       uvdar_robofly::ImagePointsWithFloatStamped msg; */
       /*       msg.stamp        = point_seen[camera_index][i].back().sample_time; */
       /*       msg.image_width  = points_seen_msg->image_width; */
       /*       msg.image_height = points_seen_msg->image_height; */
 
       /*       for (auto& blinker : point_seen[camera_index][i].back().positions) { */
-      /*         uvdar_core::Point2DWithFloat point; */
+      /*         uvdar_robofly::Point2DWithFloat point; */
       /*         point.x     = blinker.x; */
       /*         point.y     = blinker.y; */
       /*         point.value = point_seen[camera_index][i].back().frequency; */
@@ -1005,7 +1005,7 @@ private:
        * Predelat vse odsud dale
        *
        * */
-      /* uvdar_core::RecMsg rm_pub; */
+      /* uvdar_robofly::RecMsg rm_pub; */
 
       int rec_id = 2 * received_msg_raw[0] + received_msg_raw[1];
       if (rec_id == uav_id) {

@@ -16,7 +16,7 @@
 #include <mrs_lib/image_publisher.h>
 #include <mrs_lib/timer.h>
 #include <std_msgs/Float32.h>
-#include <uvdar_core/ImagePointsWithFloatStamped.h>
+#include <uvdar_robofly/ImagePointsWithFloatStamped.h>
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -219,7 +219,7 @@ namespace uvdar {
     };
 
     struct InputData {
-      std::vector<uvdar_core::Point2DWithFloat> points;
+      std::vector<uvdar_robofly::Point2DWithFloat> points;
       ros::Time time;
         /* geometry_msgs::TransformStamped tf; */
     };
@@ -727,7 +727,7 @@ namespace uvdar {
           InputData id;
           latest_input_data_.push_back(id);
 
-          blinkers_seen_callback_t callback = [image_index=i,this] (const uvdar_core::ImagePointsWithFloatStampedConstPtr& pointsMessage) { 
+          blinkers_seen_callback_t callback = [image_index=i,this] (const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& pointsMessage) { 
             ProcessPoints(pointsMessage, image_index);
           };
           ROS_INFO_STREAM("[UVDARPoseCalculator]: Subscribing to " << _blinkers_seen_topics[i]);
@@ -896,7 +896,7 @@ namespace uvdar {
         int i=0;
         for (auto calib_file : _calib_files_){
           if (calib_file == "default"){
-            file_name = ros::package::getPath("uvdar_core")+"/config/ocamcalib/calib_results_bf_uv_fe.txt";
+            file_name = ros::package::getPath("uvdar_robofly")+"/config/ocamcalib/calib_results_bf_uv_fe.txt";
           }
           else {
             file_name = calib_file;
@@ -954,10 +954,10 @@ namespace uvdar {
         std::string file_name;
         if (!_custom_model_){
           if (_quadrotor_){
-            file_name = ros::package::getPath("uvdar_core")+"/config/models/quadrotor.txt";
+            file_name = ros::package::getPath("uvdar_robofly")+"/config/models/quadrotor.txt";
           }
           else {
-            file_name = ros::package::getPath("uvdar_core")+"/config/models/hexarotor.txt";
+            file_name = ros::package::getPath("uvdar_robofly")+"/config/models/hexarotor.txt";
           }
         }
         else {
@@ -983,7 +983,7 @@ namespace uvdar {
        * @param image_index The index of the current camera used to generate the input message
        */
       /* ProcessPoints //{ */
-      void ProcessPoints(const uvdar_core::ImagePointsWithFloatStampedConstPtr& msg, size_t image_index) {
+      void ProcessPoints(const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& msg, size_t image_index) {
         if (!initialized_){
           ROS_ERROR_STREAM("[UVDARPoseCalculator]: Uninitialized! Ignoring image points.");
           return;
@@ -1113,7 +1113,7 @@ namespace uvdar {
           /* batch_processsed_[image_index] = false; */
 
           /* int                        countSeen; */
-          std::vector<uvdar_core::Point2DWithFloat> points;
+          std::vector<uvdar_robofly::Point2DWithFloat> points;
           last_blink_time_ = latest_local.time;
           if (_debug_)
             ROS_INFO_STREAM("[UVDARPoseCalculator]: Received points: " << latest_local.points.size());
@@ -1920,7 +1920,7 @@ namespace uvdar {
        * @return A set of separated points sets, each accompanied by a unique integer identifier. The idientifier is equal to TID + 1000*CL where TID is the id of the UAV associated with frequencies of the markers and CL is the order number of the current cluster starting with 0. Ordinarilly, there should be only one cluster per target.
        */
       /* separateBySignals //{ */
-      std::vector<ImageCluster> separateBySignals(std::vector<uvdar_core::Point2DWithFloat> points){
+      std::vector<ImageCluster> separateBySignals(std::vector<uvdar_robofly::Point2DWithFloat> points){
         std::vector<ImageCluster> separated_points;
         /* separated_points.resize(_target_count_); */
 
@@ -4624,7 +4624,7 @@ namespace uvdar {
         Profiler profiler_thread_;
 
 
-        using blinkers_seen_callback_t = boost::function<void (const uvdar_core::ImagePointsWithFloatStampedConstPtr& msg)>;
+        using blinkers_seen_callback_t = boost::function<void (const uvdar_robofly::ImagePointsWithFloatStampedConstPtr& msg)>;
         std::vector<ros::Subscriber> sub_blinkers_seen_;
         ros::Time last_blink_time_;
 

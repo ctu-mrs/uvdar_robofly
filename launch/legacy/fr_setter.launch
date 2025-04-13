@@ -32,7 +32,7 @@
 
     </node>
 
-    <node name="fr_setter" pkg="uvdar_core" type="fr_setter_node" output="screen" >
+    <node name="fr_setter" pkg="uvdar_robofly" type="fr_setter_node" output="screen" >
       <param name="uav_name" value="$(arg uav_name)" />
         <!-- Publisher -->
       <remap from="~baca_protocol_out" to="/$(arg uav_name)/serial_uvdar/send_message" />

@@ -7,7 +7,7 @@ windows:
   - launch:
       layout: even-vertical
       panes:
-        - roslaunch uvdar_core rosbag_camp.launch uav_name:=$UAV_NAME use_4DHT:=false
+        - roslaunch uvdar_robofly rosbag_camp.launch uav_name:=$UAV_NAME use_4DHT:=false
   - play:
       layout: even-vertical
       panes:

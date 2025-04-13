@@ -1,9 +1,9 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <mrs_lib/param_loader.h>
-#include <uvdar_core/ImagePointsWithFloatStamped.h>
+#include <uvdar_robofly/ImagePointsWithFloatStamped.h>
 /* #include <uvdar_gazebo_plugin/LedInfo.h> */
-#include <uvdar_core/USM.h>
+#include <uvdar_robofly/USM.h>
 #include <mrs_msgs/String.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Quaternion.h>
@@ -13,8 +13,8 @@
 #include <std_msgs/Float32.h>
 #include <mrs_msgs/SetInt.h>
 #include <mrs_msgs/Float64Srv.h>
-#include <uvdar_core/SetLedMessage.h>
-#include <uvdar_core/DefaultMsg.h>
+#include <uvdar_robofly/SetLedMessage.h>
+#include <uvdar_robofly/DefaultMsg.h>
 
 #define SEPARATOR_BITS 5
 
@@ -27,7 +27,7 @@ std::vector<std::string>    leds_topics;
 std::vector<int>            curr_msg;
 std::vector<int>            curr_frame;
 // std::vector<int> curr_frame_raw;
-uvdar_core::SetLedMessage led_msg;
+uvdar_robofly::SetLedMessage led_msg;
 int                              rate = (int)(80 / 3);  // three frames per bit. TODO variable rate based on estimated camera frequency
 ros::Subscriber                  USmsgSub;
 ros::Subscriber                  OdomSub;
@@ -98,7 +98,7 @@ public:
 
     sub_default_msg  = nh.subscribe("/" + uav_name + "/uvdar_communication/default_angle_msg", 1, &TX_processor::defMsg, this);    // sub for get info about heading
 
-    led_message_client = nh.serviceClient<uvdar_core::SetLedMessage>(sig_setter_service);
+    led_message_client = nh.serviceClient<uvdar_robofly::SetLedMessage>(sig_setter_service);
     led_mode_client = nh.serviceClient<mrs_msgs::SetInt>(mode_setter_service);
     led_frequency_client = nh.serviceClient<mrs_msgs::Float64Srv>(frequency_setter_service);
 
@@ -135,7 +135,7 @@ private:
     act_heading                 = toYaw(q.x, q.y, q.z, q.w);
   }
   
-  void defMsg(const uvdar_core::DefaultMsg& msg) {
+  void defMsg(const uvdar_robofly::DefaultMsg& msg) {
     default_msg.enable = msg.enable;
     default_msg.msg = msg.message;
   }
@@ -148,7 +148,7 @@ private:
   }
 
   // callback for load custom msg into queue for send through uvdar comm. channel
-  void usm_cb(const uvdar_core::USM& msg) {
+  void usm_cb(const uvdar_robofly::USM& msg) {
     Msg2send rec;
     rec.blank_msg = msg.blank_msg;
     rec.msg_type  = msg.msg_type;

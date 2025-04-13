@@ -6,9 +6,9 @@
 #include <std_srvs/Trigger.h>
 #include <std_srvs/SetBool.h>
 #include <mrs_lib/param_loader.h>
-#include <uvdar_core/SetLedMessage.h>
-/* #include <uvdar_core/SetIntIndex.h> */
-#include <uvdar_core/SetInts.h>
+#include <uvdar_robofly/SetLedMessage.h>
+/* #include <uvdar_robofly/SetIntIndex.h> */
+#include <uvdar_robofly/SetInts.h>
 #include <fstream>
 
 #define UVDAR_CLASSIC false
@@ -82,7 +82,7 @@ namespace uvdar {
           clients_set_sq_gz.push_back(nh.serviceClient<mrs_msgs::SetInt>("/gazebo/ledSignalSetter/" + _uav_name_ + "_" + std::to_string(i + 1)));
           clients_set_fr_gz.push_back(nh.serviceClient<mrs_msgs::Float64Srv>("/gazebo/ledFrequencySetter/" + _uav_name_ + "_" + std::to_string(i + 1)));
           clients_set_md_gz.push_back(nh.serviceClient<mrs_msgs::SetInt>("/gazebo/ledModeSetter/" + _uav_name_ +  "_" +std::to_string(i + 1)));
-          clients_set_ms_gz.push_back(nh.serviceClient<uvdar_core::SetLedMessage>("/gazebo/ledMessageSender/" + _uav_name_ + "_" + std::to_string(i + 1)));
+          clients_set_ms_gz.push_back(nh.serviceClient<uvdar_robofly::SetLedMessage>("/gazebo/ledMessageSender/" + _uav_name_ + "_" + std::to_string(i + 1)));
           clients_set_ac_gz.push_back(nh.serviceClient<std_srvs::SetBool>("/gazebo/ledActiveSetter/" + _uav_name_ +  "_" +std::to_string(i + 1)));
         }
 
@@ -315,7 +315,7 @@ namespace uvdar {
         return false;
       }
 
-      bool callbackSelectSequences(uvdar_core::SetInts::Request &req, uvdar_core::SetInts::Response &res){
+      bool callbackSelectSequences(uvdar_robofly::SetInts::Request &req, uvdar_robofly::SetInts::Response &res){
         if (!initialized){
           ROS_ERROR("[UVDARLedManager]: LED manager is NOT initialized!");
           res.success = false;
@@ -405,12 +405,12 @@ namespace uvdar {
         callbackSetFrequency(dummy_float_req,dummy_float_res);
         sleeper.sleep();
 
-        /* uvdar_core::SetIntIndex::Request ind_req; */
-        /* uvdar_core::SetIntIndex::Response ind_res; */
+        /* uvdar_robofly::SetIntIndex::Request ind_req; */
+        /* uvdar_robofly::SetIntIndex::Response ind_res; */
         /* ind_req.value = req.value; */
         /* callbackSelectSingleSequence(req,res); */
-        uvdar_core::SetInts::Request req_seqences;
-        uvdar_core::SetInts::Response res_seqences;
+        uvdar_robofly::SetInts::Request req_seqences;
+        uvdar_robofly::SetInts::Response res_seqences;
         unsigned char val = (unsigned char)(req.value);
         req_seqences.value.push_back(4*val+0);
         req_seqences.value.push_back(4*val+1);
@@ -507,7 +507,7 @@ namespace uvdar {
           return true;
         }
 
-        bool callbackSetMessage(uvdar_core::SetLedMessage::Request &req, uvdar_core::SetLedMessage::Response &res){
+        bool callbackSetMessage(uvdar_robofly::SetLedMessage::Request &req, uvdar_robofly::SetLedMessage::Response &res){
           if (!initialized){
           ROS_ERROR("[UVDARLedManager]: LED manager is NOT initialized!");
           res.success = false;
@@ -536,7 +536,7 @@ namespace uvdar {
           }
           baca_protocol_publisher.publish(serial_msg);
 
-          uvdar_core::SetLedMessage led_message;
+          uvdar_robofly::SetLedMessage led_message;
           led_message.request.data_frame = data_frame;
           for (auto& client : clients_set_ms_gz)
             client.call(led_message);

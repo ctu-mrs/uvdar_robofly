@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>uvdar_core</name>
+  <name>uvdar_robofly</name>
   <version>1.0.0</version>
-  <description>uvdar_core</description>
+  <description>uvdar_robofly</description>
 
   <maintainer email="viktor.walter@fel.cvut.cz">Viktor Walter</maintainer>
 

@@ -46,7 +46,7 @@
 
   <arg name="beacon" default="false"/>
 
-  <arg name="sequence_file" default="$(find uvdar_core)/config/selected.txt"/>
+  <arg name="sequence_file" default="$(find uvdar_robofly)/config/selected.txt"/>
 
   <arg name="max_px_shift_y" default="3"/>
   <arg name="max_px_shift_x" default="3"/>
@@ -81,7 +81,7 @@
 
   <arg name="blink_throttle_rate" default="10"/>
 
-  <arg name="model_file" default="$(find uvdar_core)/config/models/quadrotor.txt"/>
+  <arg name="model_file" default="$(find uvdar_robofly)/config/models/quadrotor.txt"/>
   <!-- ideal angle: 1.221730476 - pi/2 -->
 
       <!-- <origin xyz="0.108 0 0.085" rpy="1.57079632679 4.71238898038 1.57079632679" /> -->
@@ -231,7 +231,7 @@
       args="messages /$(arg uav_name)/uvdar/blinkers_seen_back $(arg blink_throttle_rate) /$(arg uav_name)/uvdar/blinkers_seen_back/throttled" />
       
     
-      <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_core" type="uvdar_pose_calculator_node" output="screen" launch-prefix="debug_roslaunch"> --> 
+      <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_robofly" type="uvdar_pose_calculator_node" output="screen" launch-prefix="debug_roslaunch"> --> 
     <node name="uvdar_pose_calculator_node" pkg="uvdar_core" type="uvdar_pose_calculator_node" output="screen" > 
         <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_core" type="uvdar_pose_calculator_node" launch-prefix="valgrind -/-tool=callgrind -/-callgrind-out-file=/home/viktor/callgrind.out -/-instr-atstart=no -/-collect-atstart=yes"> --> 
             <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_core" type="uvdar_pose_calculator_node" launch-prefix="valgrind -/-tool=callgrind -/-callgrind-out-file=/home/viktor/callgrind.out"> --> 

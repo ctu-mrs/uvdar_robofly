@@ -2,7 +2,7 @@ location: .gitman
 sources:
   - repo: https://github.com/TimLakemann/ami.git
     name: ami
-    rev: master
+    rev: robofly 
     type: git
     params:
     sparse_paths:
@@ -15,7 +15,7 @@ sources:
 sources_locked:
   - repo: https://github.com/TimLakemann/ami.git
     name: ami
-    rev: f9b44c56297effa62badf9cab835b06a6528e074
+    rev: 540321695532cc627fd5924c4774543837d14a21
     type: git
     params:
     sparse_paths:

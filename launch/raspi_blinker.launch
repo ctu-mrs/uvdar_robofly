@@ -1,10 +1,10 @@
 <launch>
   <arg name="UAV_NAME" default="$(optenv UAV_NAME uav)" />
-  <arg name="sequence_file" default="$(find uvdar_core)/config/selected.txt"/>
+  <arg name="sequence_file" default="$(find uvdar_robofly)/config/selected.txt"/>
 
   <group ns="$(arg UAV_NAME)">
 
-    <node name="raspi_uvdar_blinker_node" pkg="uvdar_core" type="raspi_uvdar_blinker_node" output="screen" respawn="true">
+    <node name="raspi_uvdar_blinker_node" pkg="uvdar_robofly" type="raspi_uvdar_blinker_node" output="screen" respawn="true">
       <param name="uav_name" type="string" value="$(arg UAV_NAME)"/>
       <param name="sequence_file" type="string" value="$(arg sequence_file)" />
       <param name="initial_id" type="int" value="0" />

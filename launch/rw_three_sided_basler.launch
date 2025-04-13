@@ -27,7 +27,7 @@
   <arg name="expose_us_right" default="$(env BASLER_UV_RIGHT_EXPOSE_US)"/>
   <arg name="expose_us_back" default="$(env BASLER_UV_BACK_EXPOSE_US)"/>
   
-  <arg name="camera_config_file" default="$(find uvdar_core)/config/camera_config/basler_grayscale.yaml" />
+  <arg name="camera_config_file" default="$(find uvdar_robofly)/config/camera_config/basler_grayscale.yaml" />
 
   <arg name="calibrations_folder" default="$(find mrs_uav_deployment)/config/uvdar_calibrations"/>
 
@@ -89,12 +89,12 @@
   <arg name="id20" value="19"/>
   <arg name="id21" value="20"/>
 
-  <arg name="sequence_file" default="$(find uvdar_core)/config/selected.txt"/>
+  <arg name="sequence_file" default="$(find uvdar_robofly)/config/selected.txt"/>
 
   <!-- Model settings: -->
 
   <arg name="use_masks" default="true"/>
-  <arg name="model_file" default="$(find uvdar_core)/config/models/quadrotor_foursided_px4_motor_aligned.txt"/>
+  <arg name="model_file" default="$(find uvdar_robofly)/config/models/quadrotor_foursided_px4_motor_aligned.txt"/>
   <arg name="beacon" default="false"/>
 
   <arg name="blink_throttle_rate" default="10"/>
@@ -269,9 +269,9 @@
       <remap from="~ami_all_seq_info_right" to="/$(arg uav_name)/uvdar/ami_all_seq_info_right"/>
       <remap from="~ami_all_seq_info_back" to="/$(arg uav_name)/uvdar/ami_all_seq_info_back"/>
     </node>
-    <node name="uvdar_pose_calculator_node" pkg="uvdar_core" type="uvdar_pose_calculator_node" output="screen" > 
-        <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_core" type="uvdar_pose_calculator_node" launch-prefix="valgrind -/-tool=callgrind -/-callgrind-out-file=/home/viktor/callgrind.out -/-instr-atstart=no -/-collect-atstart=yes"> --> 
-            <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_core" type="uvdar_pose_calculator_node" launch-prefix="valgrind -/-tool=callgrind -/-callgrind-out-file=/home/viktor/callgrind.out"> --> 
+    <node name="uvdar_pose_calculator_node" pkg="uvdar_robofly" type="uvdar_pose_calculator_node" output="screen" > 
+        <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_robofly" type="uvdar_pose_calculator_node" launch-prefix="valgrind -/-tool=callgrind -/-callgrind-out-file=/home/viktor/callgrind.out -/-instr-atstart=no -/-collect-atstart=yes"> --> 
+            <!-- <node name="uvdar_pose_calculator_node" pkg="uvdar_robofly" type="uvdar_pose_calculator_node" launch-prefix="valgrind -/-tool=callgrind -/-callgrind-out-file=/home/viktor/callgrind.out"> --> 
       <param name="uav_name" type = "string" value="$(arg uav_name)"/>
       <param name="debug"		type="bool" value="false"/> 
       <!-- <param name="debug"		type="bool" value="false"/> --> 

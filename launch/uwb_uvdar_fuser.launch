@@ -104,8 +104,8 @@
 
   <arg name="uvdar_id" value="$(optenv UVDAR_ID)"/>
 
-  <arg name="sequence_file" default="$(find uvdar_core)/config/selected.txt"/>
-  <arg name="model_file" default="$(find uvdar_core)/config/models/quadrotor_foursided.txt"/>
+  <arg name="sequence_file" default="$(find uvdar_robofly)/config/selected.txt"/>
+  <arg name="model_file" default="$(find uvdar_robofly)/config/models/quadrotor_foursided.txt"/>
 
   <arg name="use_masks" default="false"/>
 
@@ -154,7 +154,7 @@
     <node pkg="nodelet" type="nodelet" name="uvdar_camera_front" args="$(arg nodelet) libcamera_ros_driver/LibcameraRosDriver $(arg nodelet_manager)" output="screen" respawn="true" >
 
       <!-- Load the default param files -->
-      <rosparam command="load" file="$(find uvdar_core)/config/camera_config/raspi_cam_config_front.yaml" />
+      <rosparam command="load" file="$(find uvdar_robofly)/config/camera_config/raspi_cam_config_front.yaml" />
 
       <param if="$(eval arg('custom_config') == '')" name="custom_config" value="" />
       <rosparam if="$(eval not arg('custom_config') == '' and arg('custom_config')[0] == '/')" command="load" file="$(arg custom_config)" />
@@ -182,7 +182,7 @@
     <node pkg="nodelet" type="nodelet" name="uvdar_camera_back" args="$(arg nodelet) libcamera_ros_driver/LibcameraRosDriver $(arg nodelet_manager)" output="screen" respawn="true" >
 
       <!-- Load the default param files -->
-      <rosparam command="load" file="$(find uvdar_core)/config/camera_config/raspi_cam_config_back.yaml" />
+      <rosparam command="load" file="$(find uvdar_robofly)/config/camera_config/raspi_cam_config_back.yaml" />
 
       <param if="$(eval arg('custom_config') == '')" name="custom_config" value="" />
       <rosparam if="$(eval not arg('custom_config') == '' and arg('custom_config')[0] == '/')" command="load" file="$(arg custom_config)" />
@@ -337,8 +337,8 @@
     <!--   <param name="enable_requests" value="1" /> -->
     <!-- </node> -->
 
-    <node name="UWB_UVDAR_Fuser" pkg="uvdar_core" type="uwb_uvdar_fuser_node" output="screen" respawn="false">
-    <!-- <node name="UWB_UVDAR_Fuser" pkg="uvdar_core" type="uwb_uvdar_fuser_node" output="screen" respawn="false"  launch-prefix="debug_roslaunch"> -->
+    <node name="UWB_UVDAR_Fuser" pkg="uvdar_robofly" type="uwb_uvdar_fuser_node" output="screen" respawn="false">
+    <!-- <node name="UWB_UVDAR_Fuser" pkg="uvdar_robofly" type="uwb_uvdar_fuser_node" output="screen" respawn="false"  launch-prefix="debug_roslaunch"> -->
       <param name="uav_name" type = "string" value="$(arg uav_name)"/>
       <param name="debug"		type="bool" value="false"/> 
       <param name="visual_debug"		type="bool" value="$(arg visual_debug)"/> 
@@ -370,7 +370,7 @@
 
 
 
-    <node name="raspi_uvdar_blinker_node" pkg="uvdar_core" type="raspi_uvdar_blinker_node" output="screen" respawn="true">
+    <node name="raspi_uvdar_blinker_node" pkg="uvdar_robofly" type="raspi_uvdar_blinker_node" output="screen" respawn="true">
       <param name="uav_name" type="string" value="$(arg uav_name)"/>
       <param name="sequence_file" type="string" value="$(arg sequence_file)" />
       <param name="initial_id" type="int" value="$(arg uvdar_id)" />

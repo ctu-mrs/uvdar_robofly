@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(uvdar_core)
+project(uvdar_robofly)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,18 +33,18 @@ set(CATKIN_DEPENDENCIES
   )
 
 set(LIBRARIES
-  UvdarCore_OCamCalib
-  UvdarCore_ht4dbt
-  UvdarCore_ami
-  UvdarCore_extendedSearch
-  UvdarCore_uv_led_detect_fast
-  UvdarCore_frequency_classifier
-  UvdarCore_color_selector
-  UvdarCore_UVDARDetector
-  UvdarCore_unscented
-  UvdarCore_UVDARBlinkProcessor
-  UvdarCore_UVDARBluefoxEmulator
-  UvdarCore_compute_lib
+  UvdarRobofly_OCamCalib
+  UvdarRobofly_ht4dbt
+  UvdarRobofly_ami
+  UvdarRobofly_extendedSearch
+  UvdarRobofly_uv_led_detect_fast
+  UvdarRobofly_frequency_classifier
+  UvdarRobofly_color_selector
+  UvdarRobofly_UVDARDetector
+  UvdarRobofly_unscented
+  UvdarRobofly_UVDARBlinkProcessor
+  UvdarRobofly_UVDARBluefoxEmulator
+  UvdarRobofly_compute_lib
   )
 
 set(EXECUTABLES
@@ -172,7 +172,7 @@ add_executable(new_uvdar_rx_node
 target_link_libraries(new_uvdar_rx_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
-  UvdarCore_ht4dbt
+  UvdarRobofly_ht4dbt
   )
 
 add_dependencies(new_uvdar_rx_node
@@ -182,131 +182,131 @@ add_dependencies(new_uvdar_rx_node
 
 ## | ------------------------ OCamCalib ----------------------- |
 
-add_library(UvdarCore_OCamCalib
+add_library(UvdarRobofly_OCamCalib
   include/OCamCalib/ocam_functions.cpp
   )
 
-target_link_libraries(UvdarCore_OCamCalib
+target_link_libraries(UvdarRobofly_OCamCalib
   ${catkin_LIBRARIES}
   )
 
-add_dependencies(UvdarCore_OCamCalib
+add_dependencies(UvdarRobofly_OCamCalib
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_compile_options(UvdarCore_OCamCalib PRIVATE
+target_compile_options(UvdarRobofly_OCamCalib PRIVATE
   -Wno-unused-variable
   -Wno-unused-result
   )
 
 ## | ------------------------- Uvdar_ActiveRadar ------------------------- |
-add_library(UvdarCore_SocketUtils
+add_library(UvdarRobofly_SocketUtils
   include/socket_utils/socket_utils.cpp
 )
 
-add_dependencies(UvdarCore_SocketUtils
+add_dependencies(UvdarRobofly_SocketUtils
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_SocketUtils
+target_link_libraries(UvdarRobofly_SocketUtils
   ${catkin_LIBRARIES}
   )
 
-add_library(UvdarCore_ActiveRadar
+add_library(UvdarRobofly_ActiveRadar
   src/active_radar.cpp
   src/ranging_client.cpp
 )
 
-add_dependencies(UvdarCore_ActiveRadar
+add_dependencies(UvdarRobofly_ActiveRadar
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_ActiveRadar
+target_link_libraries(UvdarRobofly_ActiveRadar
   ${catkin_LIBRARIES}
-  UvdarCore_SocketUtils 
+  UvdarRobofly_SocketUtils 
   )
-## | ------------------------- UvdarCore_ht4dbt ------------------------- |
+## | ------------------------- UvdarRobofly_ht4dbt ------------------------- |
 
-add_library(UvdarCore_ht4dbt
+add_library(UvdarRobofly_ht4dbt
   include/ht4dbt/ht4d.cpp
   include/ht4dbt/ht4d_cpu.cpp
   include/ht4dbt/ht4d_cpu.cpp
   )
 
-add_dependencies(UvdarCore_ht4dbt
+add_dependencies(UvdarRobofly_ht4dbt
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_ht4dbt
+target_link_libraries(UvdarRobofly_ht4dbt
   ${catkin_LIBRARIES}
-  UvdarCore_compute_lib
+  UvdarRobofly_compute_lib
   )
 
-## | -------------------------- UvdarCore_ami -------------------------- |
+## | -------------------------- UvdarRobofly_ami -------------------------- |
 
-add_library(UvdarCore_ami
+add_library(UvdarRobofly_ami
   include/ami/ami.cpp
   )
 
-add_dependencies(UvdarCore_ami
+add_dependencies(UvdarRobofly_ami
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_ami
+target_link_libraries(UvdarRobofly_ami
   ${catkin_LIBRARIES}
   )
 
 ## | --------------------- extended Search -------------------- |
 
-add_library(UvdarCore_extendedSearch
+add_library(UvdarRobofly_extendedSearch
   include/ami/ami_extended_search.cpp
   )
 
-add_dependencies(UvdarCore_extendedSearch
+add_dependencies(UvdarRobofly_extendedSearch
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_extendedSearch
+target_link_libraries(UvdarRobofly_extendedSearch
   ${catkin_LIBRARIES}
   )
 
 ## | ------------------- uv led detect fast ------------------- |
 
-add_library(UvdarCore_uv_led_detect_fast
+add_library(UvdarRobofly_uv_led_detect_fast
   include/detect/uv_led_detect_fast_cpu.cpp
   include/detect/uv_led_detect_fast_gpu.cpp
   )
 
-add_dependencies(UvdarCore_uv_led_detect_fast
+add_dependencies(UvdarRobofly_uv_led_detect_fast
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_uv_led_detect_fast
+target_link_libraries(UvdarRobofly_uv_led_detect_fast
   debug
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
-  UvdarCore_compute_lib
+  UvdarRobofly_compute_lib
   )
 
 ## | ------------------ frequency classifier ------------------ |
 
-add_library(UvdarCore_frequency_classifier
+add_library(UvdarRobofly_frequency_classifier
   include/frequency_classifier/frequency_classifier.cpp
   )
 
-add_dependencies(UvdarCore_frequency_classifier
+add_dependencies(UvdarRobofly_frequency_classifier
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_frequency_classifier
+target_link_libraries(UvdarRobofly_frequency_classifier
   debug
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
@@ -314,16 +314,16 @@ target_link_libraries(UvdarCore_frequency_classifier
 
 ## | --------------------- color selector --------------------- |
 
-add_library(UvdarCore_color_selector
+add_library(UvdarRobofly_color_selector
   include/color_selector/color_selector.cpp
   )
 
-add_dependencies(UvdarCore_color_selector
+add_dependencies(UvdarRobofly_color_selector
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_color_selector
+target_link_libraries(UvdarRobofly_color_selector
   debug
   ${OpenCV_LIBRARIES}
   ${catkin_LIBRARIES}
@@ -331,18 +331,18 @@ target_link_libraries(UvdarCore_color_selector
 
 ## | --------------------- compute lib --------------------- |
 
-add_library(UvdarCore_compute_lib
+add_library(UvdarRobofly_compute_lib
   include/compute_lib/compute_lib.c
   include/compute_lib/queue.c
   include/compute_lib/gl32_utils.c
   )
 
-add_dependencies(UvdarCore_compute_lib
+add_dependencies(UvdarRobofly_compute_lib
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_compute_lib
+target_link_libraries(UvdarRobofly_compute_lib
   debug
   ${OpenGL_LIBRARIES}
   ${LIBGBM_LIBRARIES}
@@ -354,55 +354,55 @@ target_link_libraries(UvdarCore_compute_lib
 
 ## | --------------------- uvdar detector --------------------- |
 
-add_library(UvdarCore_UVDARDetector
+add_library(UvdarRobofly_UVDARDetector
   src/detector.cpp
   )
 
-add_dependencies(UvdarCore_UVDARDetector
+add_dependencies(UvdarRobofly_UVDARDetector
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_UVDARDetector
+target_link_libraries(UvdarRobofly_UVDARDetector
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
-  UvdarCore_uv_led_detect_fast
+  UvdarRobofly_uv_led_detect_fast
   )
 
-## | ------------------------ UvdarCore_unscented ----------------------- |
+## | ------------------------ UvdarRobofly_unscented ----------------------- |
 
-add_library(UvdarCore_unscented
+add_library(UvdarRobofly_unscented
   include/unscented/unscented.cpp
   )
 
-add_dependencies(UvdarCore_unscented
+add_dependencies(UvdarRobofly_unscented
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_unscented
+target_link_libraries(UvdarRobofly_unscented
   ${catkin_LIBRARIES}
   )
 
 ## | ------------------ uvdar blnk processor ------------------ |
 
-add_library(UvdarCore_UVDARBlinkProcessor
+add_library(UvdarRobofly_UVDARBlinkProcessor
   src/blink_processor.cpp
   )
 
-add_dependencies(UvdarCore_UVDARBlinkProcessor
+add_dependencies(UvdarRobofly_UVDARBlinkProcessor
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_UVDARBlinkProcessor
+target_link_libraries(UvdarRobofly_UVDARBlinkProcessor
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
-  UvdarCore_ht4dbt
-  UvdarCore_frequency_classifier
-  UvdarCore_ami
-  UvdarCore_extendedSearch
-  UvdarCore_color_selector
+  UvdarRobofly_ht4dbt
+  UvdarRobofly_frequency_classifier
+  UvdarRobofly_ami
+  UvdarRobofly_extendedSearch
+  UvdarRobofly_color_selector
   )
 
 ## | --------------- uvdar pose calculator node --------------- |
@@ -420,10 +420,10 @@ target_link_libraries(uvdar_pose_calculator_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${EIGEN3_LIBRARIES}
-  UvdarCore_OCamCalib
-  UvdarCore_unscented
-  UvdarCore_color_selector
-  UvdarCore_frequency_classifier
+  UvdarRobofly_OCamCalib
+  UvdarRobofly_unscented
+  UvdarRobofly_color_selector
+  UvdarRobofly_frequency_classifier
   )
 
 ## | -------------------- uvdar filter node ------------------- |
@@ -458,7 +458,7 @@ target_link_libraries(uwb_uvdar_fuser_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${EIGEN3_LIBRARIES}
-  UvdarCore_OCamCalib
+  UvdarRobofly_OCamCalib
   )
 
 ## | -------------------- Raspi UVDAR blinker node ------------------- |
@@ -495,20 +495,20 @@ endif()
 
 ## | ----------------- uvdar bluefox emulator ----------------- |
 
-add_library(UvdarCore_UVDARBluefoxEmulator
+add_library(UvdarRobofly_UVDARBluefoxEmulator
   src/bluefox_emulator.cpp
   )
 
-add_dependencies(UvdarCore_UVDARBluefoxEmulator
+add_dependencies(UvdarRobofly_UVDARBluefoxEmulator
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   )
 
-target_link_libraries(UvdarCore_UVDARBluefoxEmulator
+target_link_libraries(UvdarRobofly_UVDARBluefoxEmulator
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${EIGEN3_LIBRARIES}
-  UvdarCore_OCamCalib
+  UvdarRobofly_OCamCalib
   )
 
 ## | ----------------- uvdar led manager node ----------------- |

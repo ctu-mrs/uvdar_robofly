@@ -5,7 +5,7 @@
 #include <mrs_msgs/Float64Srv.h>
 #include <mrs_msgs/SetInt.h>
 #include <std_srvs/SetBool.h>
-#include <uvdar_core/SetInts.h>
+#include <uvdar_robofly/SetInts.h>
 
 #include <fstream>
 #include <signal.h>
@@ -250,7 +250,7 @@ namespace uvdar {
         return true;
       }
 
-      bool callbackSetCustom(uvdar_core::SetInts::Request &req, uvdar_core::SetInts::Response &res){
+      bool callbackSetCustom(uvdar_robofly::SetInts::Request &req, uvdar_robofly::SetInts::Response &res){
         if (!initialized_){
           ROS_ERROR("[Raspi_UVDAR_Blinker]: Blinker is NOT initialized!");
           res.success = false;

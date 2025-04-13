@@ -5,7 +5,7 @@
 #include <string>
 #include <cmath>
 #include <mrs_modules_msgs/BacaProtocol.h>
-#include <uvdar_core/SetLedState.h>
+#include <uvdar_robofly/SetLedState.h>
 
 namespace fr_setter
 {
@@ -35,7 +35,7 @@ public:
   }
 
 private:
-  bool FrequencySetterCallback(uvdar_core::SetLedState::Request& req, uvdar_core::SetLedState::Response& res) {
+  bool FrequencySetterCallback(uvdar_robofly::SetLedState::Request& req, uvdar_robofly::SetLedState::Response& res) {
     mrs_modules_msgs::BacaProtocol serial_msg;
     serial_msg.stamp = ros::Time::now();
         
