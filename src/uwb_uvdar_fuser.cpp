@@ -86,7 +86,7 @@ namespace uvdar {
     private:
       /* attributes //{ */
 
-      bool _debug_ = true;
+      bool _debug_ = false;
 
       bool initialized_ = false;
       std::string _uav_name_;
@@ -418,9 +418,10 @@ namespace uvdar {
           for (auto target_points : associated_points) {
           int target = target_points.first;
             for (auto& pt: target_points.second){
+              /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Point: [" << pt.x << "," << pt.y << "]."); */
               e::Vector3d curr_direction_local = directionFromCamPoint(cv::Point2d(pt.x, pt.y), image_index);
-              // ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Line direction in camera: [" << curr_direction_local.transpose() << "]."); 
-              // ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Camera resolution: [" << cameras_[image_index].oc_model.width << "," << cameras_[image_index].oc_model.height << "]");
+              /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Line direction in camera: [" << curr_direction_local.transpose() << "]."); */
+              /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Camera resolution: [" << cameras_[image_index].oc_model.width << "," << cameras_[image_index].oc_model.height << "]"); */
                     
 
               e::Vector3d curr_direction; //global
@@ -437,12 +438,12 @@ namespace uvdar {
 
               //TODO: implement Masreliez Uniform Updater in mrs_lib
               //TODO: implement plane filtering in DKF
-              //TODO:   fd_[target]
+              //TODO: initialize fd_[target]
               //TODO: mutex fd_[target]
 
               // Apply the correction step for line
               /* fd_[target].filter_state = filter_.correctLine(fd_[target].filter_state, camera_origin, curr_direction, LINE_VARIANCE, true); //true should activate Masreliez uniform filtering */
-              // ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Line direction in output: [" << curr_direction.transpose() << "].");
+              /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Line direction in output: [" << curr_direction.transpose() << "]."); */
               fd_[target].filter_state = filter_->correctLine(fd_[target].filter_state, camera_origin, curr_direction, sqr(3)*LINE_VARIANCE);
 
               // Restrict state to be in front of the camera
@@ -484,8 +485,8 @@ namespace uvdar {
           bool found_filter = false;
           for (auto &f: fd_){
             if (f.id == ID){
-              if (measurementCompatible(f, pt, image_index, msg.stamp)) 
-              // if (true)
+              /* if (measurementCompatible(f, pt, image_index, msg.stamp)) */
+              if (true)
               {
                 found_filter = true;
                 bool found_association_group = false;
@@ -600,7 +601,7 @@ namespace uvdar {
             if (f.id == ID){
               if (f.received_bearing){
                 e::Vector3d direction = f.filter_state.x.topLeftCorner(3,1).normalized();
-                ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Fusing distance measurement with distance of " << range << " with assumed direction of [ " << direction.transpose() << "]."); 
+                /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Fusing distance measurement with distance of " << range << " with assumed direction of [ " << direction.transpose() << "]."); */
                 f.filter_state = filter_->correctPlane(f.filter_state, receiver_origin+(direction*range), direction, sqr(3)*variance);
                 f.latest_measurement_range = now_time;
                 f.update_count++;
@@ -616,89 +617,6 @@ namespace uvdar {
         return;
       }
       //}
-
-
-      bool isInFrontOfCamera(e::Vector3d mean, std::string camera_frame, ros::Time stamp){
-        geometry_msgs::PoseStamped target_cam_view, target_filter;
-        target_filter.header.frame_id = _output_frame_;
-        target_filter.header.stamp = stamp;
-        target_filter.pose.position.x = mean.x();
-        target_filter.pose.position.y = mean.y();
-        target_filter.pose.position.z = mean.z();
-
-        auto ret = transformer_.transformSingle(target_filter, camera_frame);
-        if (ret) {
-          target_cam_view = ret.value();
-        }
-        else{
-          ROS_ERROR_STREAM("[UWB_UVDAR_Fuser]: Could not transform filter state from "<< _output_frame_ << " to camera frame " << camera_frame);
-          return false;
-        }
-
-        e::Vector3d target_cam_view_vector(target_cam_view.pose.position.x, target_cam_view.pose.position.y, target_cam_view.pose.position.z);
-        double norm = target_cam_view_vector.norm();
-        double cos_angle = target_cam_view_vector.normalized().dot(e::Vector3d(0,0,1));
-
-        return ((norm > 0.1) && (cos_angle > -0.173648));//cos(100 deg) 
-
-      }
-
-
-      bool measurementCompatible(FilterData filter, uvdar_robofly::Point2DWithFloat pt, int image_index, ros::Time time){
-        std::scoped_lock lock(transformer_mutex);
-
-
-        LineProperties projection_line;
-
-        auto camera_origin_tmp = transformer_.transform(e::Vector3d(0,0,0), cameras_[image_index].fromcam_tf);
-        if (!camera_origin_tmp){
-          ROS_ERROR_STREAM("[" << ros::this_node::getName().c_str() << "]: Failed to transform camera origin! Returning.");
-          return false;
-        }
-        else
-          projection_line.origin = camera_origin_tmp.value();
-
-        e::Vector3d line_direction_local = directionFromCamPoint(cv::Point2d(pt.x, pt.y), image_index);
-        e::Vector3d curr_direction; //global
-        auto line_direction_tmp = transformer_.transformAsVector(line_direction_local, cameras_[image_index].fromcam_tf);
-        if (!line_direction_tmp){
-          ROS_ERROR_STREAM("[" << ros::this_node::getName().c_str() << "]: Failed to transform direction vector! Returning.");
-          return false;
-        }
-        else
-          projection_line.direction = line_direction_tmp.value();
-
-        double mahalanobis_distance = mahalanobisDistance(filter.filter_state, projection_line);
-
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Mean: " << filter.filter_state.x.transpose()); */
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Mahalanobis distance: " << mahalanobis_distance); */
-
-        return ((mahalanobis_distance < LINE_MAH_THRESH) && (isInFrontOfCamera(filter.filter_state.x.topLeftCorner(3,1), cameras_[image_index].tf_frame, time)));
-      }
-
-      double mahalanobisDistance(statecov_t X, LineProperties line){
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver(X.P.topLeftCorner(3,3));
-        Eigen::Matrix3d sphere_transform_inverse = eigenSolver.eigenvectors() * eigenSolver.eigenvalues().cwiseSqrt().asDiagonal(); 
-        Eigen::Matrix3d sphere_transform = sphere_transform_inverse.inverse(); //transforms the Covariance to unit spherical - in the resulting space we compute the distance of the line to the estimate, corresponding to the Mahalanobis distance of the closest point on the line to the estimate mean
-        e::Vector3d d = (sphere_transform*line.direction).normalized();
-        e::Vector3d o = sphere_transform*line.origin;
-        e::Vector3d m = sphere_transform*X.x.topLeftCorner(3,1);
-        e::Vector3d W = m-o;
-        e::Vector3d closest_point = o+d*(W.dot(d));
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Origin: " << o.transpose()); */
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Mean: " << m.transpose()); */
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Dist: " << W.transpose()); */
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Direction: " << d.transpose()); */
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Scale: " << (W.dot(d))); */
-        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Closest point: " << closest_point.transpose()); */
-        return (m-closest_point).norm();
-      }
-
-      double mahalanobisDistance(statecov_t X, e::Vector3d p){
-        e::Matrix3d Sinv = X.P.topLeftCorner(3,3).inverse();
-        e::Vector3d diff = p-X.x.topLeftCorner(3,1);
-        return sqrt(diff.transpose()*Sinv*diff);
-      }
 
 
       /**
@@ -858,6 +776,63 @@ namespace uvdar {
       }
       //}
       
+      bool measurementCompatible(FilterData filter, uvdar_robofly::Point2DWithFloat pt, int image_index, ros::Time time){
+        std::scoped_lock lock(transformer_mutex);
+
+
+        LineProperties projection_line;
+
+        auto camera_origin_tmp = transformer_.transform(e::Vector3d(0,0,0), cameras_[image_index].fromcam_tf);
+        if (!camera_origin_tmp){
+          ROS_ERROR_STREAM("[" << ros::this_node::getName().c_str() << "]: Failed to transform camera origin! Returning.");
+          return false;
+        }
+        else
+          projection_line.origin = camera_origin_tmp.value();
+
+        e::Vector3d line_direction_local = directionFromCamPoint(cv::Point2d(pt.x, pt.y), image_index);
+        e::Vector3d curr_direction; //global
+        auto line_direction_tmp = transformer_.transformAsVector(line_direction_local, cameras_[image_index].fromcam_tf);
+        if (!line_direction_tmp){
+          ROS_ERROR_STREAM("[" << ros::this_node::getName().c_str() << "]: Failed to transform direction vector! Returning.");
+          return false;
+        }
+        else
+          projection_line.direction = line_direction_tmp.value();
+
+        double mahalanobis_distance = mahalanobisDistance(filter.filter_state, projection_line);
+
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Mean: " << filter.filter_state.x.transpose()); */
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Mahalanobis distance: " << mahalanobis_distance); */
+
+        return ((mahalanobis_distance < LINE_MAH_THRESH) && (isInFrontOfCamera(filter.filter_state.x.topLeftCorner(3,1), cameras_[image_index].tf_frame, time)));
+      }
+
+      double mahalanobisDistance(statecov_t X, LineProperties line){
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenSolver(X.P.topLeftCorner(3,3));
+        Eigen::Matrix3d sphere_transform_inverse = eigenSolver.eigenvectors() * eigenSolver.eigenvalues().cwiseSqrt().asDiagonal(); 
+        Eigen::Matrix3d sphere_transform = sphere_transform_inverse.inverse(); //transforms the Covariance to unit spherical - in the resulting space we compute the distance of the line to the estimate, corresponding to the Mahalanobis distance of the closest point on the line to the estimate mean
+        e::Vector3d d = (sphere_transform*line.direction).normalized();
+        e::Vector3d o = sphere_transform*line.origin;
+        e::Vector3d m = sphere_transform*X.x.topLeftCorner(3,1);
+        e::Vector3d W = m-o;
+        e::Vector3d closest_point = o+d*(W.dot(d));
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Origin: " << o.transpose()); */
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Mean: " << m.transpose()); */
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Dist: " << W.transpose()); */
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Direction: " << d.transpose()); */
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Scale: " << (W.dot(d))); */
+        /* ROS_INFO_STREAM("[" << ros::this_node::getName().c_str() << "]: Closest point: " << closest_point.transpose()); */
+        return (m-closest_point).norm();
+      }
+
+      double mahalanobisDistance(statecov_t X, e::Vector3d p){
+        e::Matrix3d Sinv = X.P.topLeftCorner(3,3).inverse();
+        e::Vector3d diff = p-X.x.topLeftCorner(3,1);
+        return sqrt(diff.transpose()*Sinv*diff);
+      }
+
+
       /**
        * @brief Predicts the filter state at target_time, given that target_time is newer than the last update or measurement
        *
@@ -899,6 +874,21 @@ namespace uvdar {
         }
         return new_state;
       }
+      //}
+
+
+      /**
+       * @brief Deletes on of the active filter states
+       *
+       * @param index The index of the filter state to remove
+       */
+      /* deleteFilter //{ */
+      void deleteFilter(int &index){
+        if (index < 0) return;
+        fd_.erase(fd_.begin()+index);
+        index--;
+      }
+      //}
 
       /**
        * @brief Returns a value between 0 and 1 representing the level of overlap between two probability distributions in the form of multivariate Gaussians. Multiplying two Gaussians produces another Gaussian, with the value of its peak roughly corresponding to the level of the overlap between the two inputs. The ouptut of this function is the value of such peak, given that the input Gaussians have been scaled s.t. their peaks have the value of 1. Therefore, the output is 1 if the means of both inputs are identical.
@@ -935,7 +925,33 @@ namespace uvdar {
         return N;
       }
       //}
-      
+
+      bool isInFrontOfCamera(e::Vector3d mean, std::string camera_frame, ros::Time stamp){
+        geometry_msgs::PoseStamped target_cam_view, target_filter;
+        target_filter.header.frame_id = _output_frame_;
+        target_filter.header.stamp = stamp;
+        target_filter.pose.position.x = mean.x();
+        target_filter.pose.position.y = mean.y();
+        target_filter.pose.position.z = mean.z();
+
+        auto ret = transformer_.transformSingle(target_filter, camera_frame);
+        if (ret) {
+          target_cam_view = ret.value();
+        }
+        else{
+          ROS_ERROR_STREAM("[UWB_UVDAR_Fuser]: Could not transform filter state from "<< _output_frame_ << " to camera frame " << camera_frame);
+          return false;
+        }
+
+        e::Vector3d target_cam_view_vector(target_cam_view.pose.position.x, target_cam_view.pose.position.y, target_cam_view.pose.position.z);
+        double norm = target_cam_view_vector.norm();
+        double cos_angle = target_cam_view_vector.normalized().dot(e::Vector3d(0,0,1));
+
+        return ((norm > 0.1) && (cos_angle > -0.173648));//cos(100 deg) 
+
+      }
+
+
       /**
        * @brief Publishes the current set of filter states to an output topic
        */
@@ -955,7 +971,7 @@ namespace uvdar {
           temp.pose.position.x = fd_curr.filter_state.x[0];
           temp.pose.position.y = fd_curr.filter_state.x[1];
           temp.pose.position.z = fd_curr.filter_state.x[2];
-          ROS_INFO_STREAM("POSTION " << temp.pose.position.x << " " << temp.pose.position.y << " " << temp.pose.position.z);
+
           qtemp = e::AngleAxisd(fd_curr.filter_state.x[3], e::Vector3d::UnitX()) * e::AngleAxisd(fd_curr.filter_state.x[4], e::Vector3d::UnitY()) * e::AngleAxisd(fd_curr.filter_state.x[5], e::Vector3d::UnitZ());
 
           temp.pose.orientation.x = qtemp.x();
@@ -1155,6 +1171,41 @@ namespace uvdar {
       }
       //}
 
+      /**
+       * @brief Changes the expression of the origAngle, such that if it is updated in a filtering process with newAngle, circularity issues will be avoided
+       *
+       * @param origAngle The angle, representing prior state, to be updated
+       * @param newAngle The new angle, representing new measurement, that affects origAngle in filtering
+       *
+       * @return The new expression of origAngle
+       */
+      /* fixAngle //{ */
+      double fixAngle(double origAngle, double newAngle){
+        double fixedPre;
+        if ( (origAngle>(2*M_PI)) || (origAngle<(-2*M_PI)) )  {
+          fixedPre = fmod(origAngle,2*M_PI);
+        }
+        else {
+          fixedPre = origAngle;
+        }
+
+        if (fixedPre>(M_PI))
+          fixedPre = fixedPre - (2.0*M_PI);
+        if (fixedPre < (-M_PI))
+          fixedPre = fixedPre + (2.0*M_PI);
+
+
+
+        if (fabs(newAngle-fixedPre)<M_PI)
+          return fixedPre;
+
+        if (fixedPre>newAngle)
+          return (fixedPre - (2.0*M_PI));
+        else
+          return (fixedPre + (2.0*M_PI));
+      }
+      //}
+
 
       /**
        * @brief Updates the shared system matrix in case that it is time step-dependent. This is useful for non-uniform time-steps
@@ -1262,11 +1313,7 @@ namespace uvdar {
         double v_i[2] = {(double)(point.y), (double)(point.x)};
         double v_w_raw[3];
         cam2world(v_w_raw, v_i, &(cameras_[image_index].oc_model));
-        if (image_index == 1){
-          ROS_INFO_STREAM("BACK CAM I GUESS");
-          return e::Vector3d(v_w_raw[1], v_w_raw[0], -v_w_raw[2]);
-        }
-        return e::Vector3d(-v_w_raw[1], v_w_raw[0], v_w_raw[2]);
+        return e::Vector3d(v_w_raw[1], v_w_raw[0], -v_w_raw[2]);
       }
       //}
       
